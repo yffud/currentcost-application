@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<projectDescription>
+	<name>CurrentCost</name>
+	<comment></comment>
+	<projects>
+	</projects>
+	<buildSpec>
+		<buildCommand>
+			<name>com.adobe.flexbuilder.project.flexbuilder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
+	</buildSpec>
+	<natures>
+		<nature>com.adobe.flexbuilder.project.flexnature</nature>
+		<nature>com.adobe.flexbuilder.project.actionscriptnature</nature>
+	</natures>
+	<linkedResources>
+		<link>
+			<name>assets/up.png</name>
+			<type>1</type>
+			<location>/Users/shaneduffy/Desktop/up.png</location>
+		</link>
+		<link>
+			<name>src/assets/Down.png</name>
+			<type>1</type>
+			<location>/Users/shaneduffy/Desktop/Down.png</location>
+		</link>
+		<link>
+			<name>src/assets/Up.png</name>
+			<type>1</type>
+			<location>/Users/shaneduffy/Desktop/up.png</location>
+		</link>
+		<link>
+			<name>assets/Down.png</name>
+			<type>1</type>
+			<location>/Users/shaneduffy/Desktop/Down.png</location>
+		</link>
+	</linkedResources>
+</projectDescription>
