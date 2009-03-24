@@ -1,0 +1,439 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute" creationComplete="init()">
+<mx:Script>
+	<![CDATA[
+			import mx.controls.Alert;
+			import mx.graphics.Stroke;
+            import mx.collections.ArrayCollection;
+            import mx.rpc.events.ResultEvent;
+            import mx.charts.chartClasses.IAxis;
+            
+            // Embedding the images
+            [Embed(source="assets/Up.png")]
+            
+            [Bindable]
+            public var Up:Class; 
+            
+            [Embed(source="assets/Down.png")]
+            
+            [Bindable]
+            public var Down:Class; 
+            
+            
+        
+            [Bindable] private var myRandomData:ArrayCollection;
+            [Bindable] private var powerChannels:ArrayCollection;
+            [Bindable] private var powerTotal:ArrayCollection;
+            [Bindable] private var temperature:ArrayCollection;
+            
+            
+            // We should fix the lenght of the graphing arrys by removing items from index(0)
+            // To stop the graphs getting to compact for realtime ones.
+            
+            
+            
+            //call on creation complete of Application
+            private function init():void{
+                
+                myRandomData = new ArrayCollection(); 
+                powerTotal = new ArrayCollection();
+                powerChannels = new ArrayCollection();
+                temperature = new ArrayCollection();
+                
+                // Lets set the first value as 0
+                //powerTotal.addItem(0);
+                //temperature.addItem(0);
+                
+                //powerChannels = new Array(5,4,2,"12:34:45");
+                
+                
+                
+                // Hide the up down images
+                total_changed_image_up.visible = false;
+                total_changed_image_down.visible = false;
+                ch1_changed_image_up.visible = false;
+                ch1_changed_image_down.visible = false;
+                ch2_changed_image_up.visible = false;
+                ch2_changed_image_down.visible = false;
+                ch3_changed_image_up.visible = false;
+                ch3_changed_image_down.visible = false;
+                
+                
+                
+                // Get values right away
+                gethttpdata.send();
+                
+                // creates a Timer
+                var minuteTimer:Timer = new Timer(6000);
+                
+                // designate listener
+                minuteTimer.addEventListener(TimerEvent.TIMER, onTick);
+
+                // starts the timer ticking
+                minuteTimer.start();
+                
+            }
+            
+            
+            // This is called at the interval timer
+            private function onTick(e:TimerEvent):void{
+                //generate radnom value between 0 and 100
+                var randomValue:Number = Math.random()*100
+                //populate data
+                
+                //myRandomData.addItem(randomValue);
+                //Total_Watts.text = randomValue.toString();
+                gethttpdata.send();  
+            }
+            
+            //Get the Data from the given URI and parse
+            private function getData():void{
+            	
+            	//Setting value for URI
+            	
+            }
+            
+            [Bindable] private var powerData:XMLList;
+            
+  			public function handleXML(event:ResultEvent): void
+    		{
+     			 
+     			 var previous_total:Number;
+     			 var previous_ch1:Number;
+     			 var previous_ch2:Number;
+     			 var previous_ch3:Number;
+     			 
+     			 var current_total:Number;
+     			 var current_ch1:Number;
+     			 var current_ch2:Number;
+     			 var current_ch3:Number;
+     			 
+     			 var config_threshold:Number = 10;
+     			 var config_maxseries:Number = 100;
+     			 var config_esb_rate:Number = 0.16;
+     			 
+     			 try{
+     			 previous_total = powerData.child("total").valueOf();
+     			 previous_ch1 = powerData.child("ch1").valueOf();
+     			 previous_ch2 = powerData.child("ch2").valueOf();
+     			 previous_ch3 = powerData.child("ch3").valueOf();
+     			 }
+     			 catch (errObject:Error){
+     			 previous_total = 0;
+     			 previous_ch1 = 0;
+     			 previous_ch2 = 0;
+     			 previous_ch3 = 0;
+     			 }
+     			 
+     			 
+     			 
+     			 
+     			 // We need to compare the previous and new values and decide on changes
+     			 
+     			 powerData = event.result.data as XMLList;
+     			 
+     			 current_total = powerData.child("total").valueOf();
+     			 current_ch1 = powerData.child("ch1").valueOf();
+     			 current_ch2 = powerData.child("ch2").valueOf();
+     			 current_ch3 = powerData.child("ch3").valueOf();
+     			 
+     			 
+     			 
+     			 // Check for changes in data
+     			 
+     			 if (int(current_total - previous_total) > config_threshold){   //UP
+     			 	//Update values and make controls visible
+     			 	total_changed.text = (current_total - previous_total).toString();
+     			 	total_changed_image_down.visible = false;
+     			 	total_changed_image_up.visible = true;
+     			 	
+     			 } else if (int(previous_total - current_total) > config_threshold){ //DOWN
+     			 	total_changed.text = (previous_total - current_total).toString();
+     			 	total_changed_image_down.visible = true;
+     			 	total_changed_image_up.visible = false;
+     			 } else {
+     			 	//Reset the values and mark controls not visible anymore
+     			 	total_changed.text = "";
+     			 	total_changed_image_down.visible = false;
+     			 	total_changed_image_up.visible = false;
+     			 	
+     			 }
+     			 
+     			 
+     			 
+     			  if (int(current_ch1 - previous_ch1) > config_threshold){   //UP
+     			 	//Update values and make controls visible
+     			 	ch1_changed.text = (current_ch1 - previous_ch1).toString();
+     			 	ch1_changed_image_down.visible = false;
+     			 	ch1_changed_image_up.visible = true;
+     			 	
+     			 } else if (int(previous_ch1 - current_ch1) > config_threshold){ //DOWN
+     			 	ch1_changed.text = (previous_ch1 - current_ch1).toString();
+     			 	ch1_changed_image_down.visible = true;
+     			 	ch1_changed_image_up.visible = false;
+     			 } else {
+     			 	//Reset the values and mark controls not visible anymore
+     			 	ch1_changed.text = "";
+     			 	ch1_changed_image_down.visible = false;
+     			 	ch1_changed_image_up.visible = false;
+     			 	
+     			 }
+     			 
+     			      			  if (int(current_ch2 - previous_ch2) > config_threshold){   //UP
+     			 	//Update values and make controls visible
+     			 	ch2_changed.text = (current_ch2 - previous_ch2).toString();
+     			 	ch2_changed_image_down.visible = false;
+     			 	ch2_changed_image_up.visible = true;
+     			 	
+     			 } else if (int(previous_ch2 - current_ch2) > config_threshold){ //DOWN
+     			 	ch2_changed.text = (previous_ch2 - current_ch2).toString();
+     			 	ch2_changed_image_down.visible = true;
+     			 	ch2_changed_image_up.visible = false;
+     			 } else {
+     			 	//Reset the values and mark controls not visible anymore
+     			 	ch2_changed.text = "";
+     			 	ch2_changed_image_down.visible = false;
+     			 	ch2_changed_image_up.visible = false;
+     			 	
+     			 }
+     			 
+     			      			  if (int(current_ch3 - previous_ch3) > config_threshold){   //UP
+     			 	//Update values and make controls visible
+     			 	ch3_changed.text = (current_ch3 - previous_ch3).toString();
+     			 	ch3_changed_image_down.visible = false;
+     			 	ch3_changed_image_up.visible = true;
+     			 	
+     			 } else if (int(previous_ch3 - current_ch3) > config_threshold){ //DOWN
+     			 	ch3_changed.text = (previous_ch3 - current_ch3).toString();
+     			 	ch3_changed_image_down.visible = true;
+     			 	ch3_changed_image_up.visible = false;
+     			 } else {
+     			 	//Reset the values and mark controls not visible anymore
+     			 	ch3_changed.text = "";
+     			 	ch3_changed_image_down.visible = false;
+     			 	ch3_changed_image_up.visible = false;
+     			 	
+     			 }
+     			 
+    
+    			// We dont want the real time graph to shrink to much so we remove items from the start
+     			 try{
+     			 if (powerTotal.length.valueOf() == config_maxseries){
+     			 	powerTotal.removeItemAt(0);
+     			 }
+     			 }catch (errObject:Error){
+     			  	// We dont care about this error as it will happy first when application is loaded.
+     			 }
+     			 
+     			 // We dont want the real time graph to shrink to much so we remove items from the start
+     			 try{
+     			 if (powerChannels.length.valueOf() == config_maxseries){
+     			 	powerChannels.removeItemAt(0);
+     			 }
+     			 }catch (errObject:Error){
+     			  	// We dont care about this error as it will happy first when application is loaded.
+     			 }
+     			 
+     			 // We dont want the real time graph to shrink to much so we remove items from the start
+     			 try{
+     			 if (temperature.length.valueOf() == (config_maxseries * 25)){
+     			 	temperature.removeItemAt(0);
+     			 }
+     			 }catch (errObject:Error){
+     			  	// We dont care about this error as it will happy first when application is loaded.
+     			 }
+     			 
+     			 
+     			 // Cost
+     			 
+     			 //TODO : Refactor the variable for kwh rate
+     			 
+     			 // Watts converted to kwatts by 24 hours * rate per kwh
+     			 cost.text = (int(((current_total/1000) * 24 * config_esb_rate)*100)/100).toFixed(2);
+     			 
+     			 ch1_cost.text = (int(((current_ch1/1000) * 24 * config_esb_rate)*100)/100).toFixed(2);
+     			 ch2_cost.text = (int(((current_ch2/1000) * 24 * config_esb_rate)*100)/100).toFixed(2);
+     			 ch3_cost.text = (int(((current_ch3/1000) * 24 * config_esb_rate)*100)/100).toFixed(2);
+     			 
+     			 
+     			 Total_Watts.text = powerData.child("total").toString();
+     			 powerTotal.addItem({watts: powerData.child("total").valueOf(),time: powerData.child("lastupdate").toString()});
+     			 temperature.addItem(powerData.child("temp").valueOf());
+     			 powerChannels.addItem({total: current_total, ch1: current_ch1, ch2: current_ch2, ch3: current_ch3, time: powerData.child("lastupdate").toString()});
+     			 
+     			 
+     			 ch1_current.text = powerData.child("ch1").toString();
+     			 ch2_current.text = powerData.child("ch2").toString();
+     			 ch3_current.text = powerData.child("ch3").toString();
+     			 temp_current.text = powerData.child("temp").toString();
+     			 
+      			// Set the unix epoch:
+				var my_date: Date = new Date(1970, 0, 1, 0, 0, 0);
+				// Add on the number of seconds (this is our unix timestamp)
+				my_date.setSeconds(powerData.child("lastupdate")); 
+     			 
+     			 lastupdate.text = my_date.toLocaleString();
+     			 
+   			 }
+   			 
+   			    			 
+   			 private function axisDateLabel(categoryValue:Object, previousCategoryValue:Object, axis:CategoryAxis, categoryItem:Object): String
+   			 {
+   			 	
+   			 	// Set the unix epoch:
+				var my_date: Date = new Date(1970, 0, 1, 0, 0, 0);
+				// Add on the number of seconds (this is our unix timestamp)
+				my_date.setSeconds(categoryValue);
+				
+				return my_date.toLocaleTimeString(); 
+   			 
+   			 	
+   			 	
+   			 }
+   			 
+   			 private function Stack():void
+   			 {
+   			 	RealTime_Channels.type = "overlaid" ;
+   			 	
+   			 }
+   			 
+   			 private function UnStack():void
+   			 {
+   			 	RealTime_Channels.type = "stacked";
+   			 }
+
+	]]>
+</mx:Script>
+
+
+
+<mx:HTTPService url="http://192.168.0.139/currentcost.xml" result="handleXML(event);" id="gethttpdata" resultFormat="e4x" />
+	   <!-- Define custom colors for use as fills in the AreaChart control. -->
+	   <mx:SolidColor id="sc1" color="blue" alpha=".3"/>
+	   <mx:SolidColor id="sc2" color="red" alpha=".3"/>
+	   <mx:SolidColor id="sc3" color="green" alpha=".3"/>
+	   <!-- Define custom Strokes. -->
+       <mx:Stroke id = "s1" color="blue" weight="2"/>
+       <mx:Stroke id = "s2" color="red" weight="2"/>
+       <mx:Stroke id = "s3" color="green" weight="2"/>
+       
+
+	<mx:DateFormatter id="dateFormatterAbbr" formatString="H NN SS" />
+	
+	
+	<mx:TabNavigator x="10" y="307" width="781" height="285">
+		<mx:Canvas label="Real Time" width="100%" height="100%">
+			<mx:AreaChart x="10" y="10" id="RealTime_Total" width="759" height="232" dataProvider="{powerTotal}" showDataTips="true">
+				 <mx:horizontalAxis>
+					<mx:CategoryAxis categoryField="time" title="Time" labelFunction="axisDateLabel"/>
+				 </mx:horizontalAxis>
+        		<mx:series>
+					<mx:AreaSeries displayName="Total Watts" yField="watts" areaFill="{sc1}" areaStroke="{s1}" xField="time"/>
+				</mx:series>
+			</mx:AreaChart>
+		</mx:Canvas>
+		
+		<!-- Channels Charts -->
+		<mx:Canvas label="Real Time Channels" width="100%" height="100%">
+			<mx:AreaChart x="10" y="10" id="RealTime_Channels" width="682" height="232" dataProvider="{powerChannels}" showDataTips="true">
+				<mx:horizontalAxis>
+					<mx:CategoryAxis categoryField="time" title="Time" labelFunction="axisDateLabel" />
+				 </mx:horizontalAxis>
+				<mx:series>
+					<mx:AreaSeries displayName="Ch1" yField="ch1" xField="time" areaFill="{sc1}" areaStroke="{s1}"/>
+					<mx:AreaSeries displayName="Ch2" yField="ch2" xField="time" areaFill="{sc2}" areaStroke="{s2}"/>
+					<mx:AreaSeries displayName="Ch3" yField="ch3" xField="time" areaFill="{sc3}" areaStroke="{s3}"/>
+				</mx:series>
+				
+				
+			</mx:AreaChart>
+			<mx:Legend x="700" y="10" dataProvider="{RealTime_Channels}" width="69" fontSize="8"/>
+		</mx:Canvas>
+		
+		
+		<mx:Canvas label="Temperature" width="100%" height="100%">
+			<mx:LineChart x="10" y="10" id="Temperature" width="759" height="232" showDataTips="true" dataProvider="{temperature}">
+				<mx:series>
+					<mx:LineSeries displayName="Degrees C" yField=""/>
+				</mx:series>
+			</mx:LineChart>
+		</mx:Canvas>
+		<mx:Canvas label="Breakdown" width="100%" height="100%">
+			<mx:PieChart x="93" y="0" id="DeviceBreakdown" width="358" height="242">
+				<mx:series>
+					<mx:PieSeries displayName="Series 1" field=""/>
+				</mx:series>
+			</mx:PieChart>
+			<mx:Legend dataProvider="{DeviceBreakdown}"/>
+		</mx:Canvas>
+		<mx:Canvas label="Day - RRD" width="100%" height="100%">
+		</mx:Canvas>
+		<mx:Canvas label="Week - RRD" width="100%" height="100%">
+		</mx:Canvas>
+		<mx:Canvas label="Month - RRD" width="100%" height="100%">
+		</mx:Canvas>
+		<mx:Canvas label="Year - RRD" width="100%" height="100%">
+		</mx:Canvas>
+	</mx:TabNavigator>
+	<mx:Accordion x="10" y="10" width="780" height="293">
+		<mx:Canvas label="CurrentCost CC128                                                                                                                                                                               www.energymasters.ie" width="100%" height="100%" id="Main">
+			<mx:Label x="10" y="23" text="Energy Now" fontSize="16" fontWeight="bold"/>
+			<mx:Label x="10" y="69" text="Cost" fontSize="16" fontWeight="bold"/>
+			<mx:Label x="10" y="122" text="Change" fontSize="16" fontWeight="bold"/>
+			<mx:Label x="145" y="15" text="0000" width="70" fontSize="26" fontWeight="bold" height="44" fontFamily="Arial" color="#000000" id="Total_Watts"/>
+			<mx:Label x="213" y="29" text="Watts" width="59"/>
+			<mx:Label x="472" y="10" text="Ch1" fontSize="14" width="70" textAlign="left"/>
+			<mx:Label x="550" y="10" text="Ch2" fontSize="14" width="71" textAlign="left"/>
+			<mx:Label x="629" y="10" text="Ch3" fontSize="14" width="70" textAlign="left"/>
+			<mx:Label x="472" y="29" text="0000" width="70" id="ch1_current" fontWeight="bold" fontSize="20"/>
+			<mx:Label x="552" y="29" text="0000" width="70" id="ch2_current" fontWeight="bold" fontSize="20"/>
+			<mx:Label x="629" y="29" text="0000" width="70" id="ch3_current" fontWeight="bold" fontSize="20"/>
+			<mx:Label x="648" y="202" id="temp_current" fontSize="30" width="120" height="35" textAlign="right" text="00.0"/>
+			<mx:Label x="705" y="232" text="Degrees C" fontSize="10"/>
+			<mx:Label x="145" y="112" text="0000" width="95" height="35" fontSize="26" color="#000000" fontWeight="bold" fontFamily="Arial" enabled="true" id="total_changed"/>
+			<mx:Label x="472" y="75" text="0000" width="70" height="27" fontSize="20" color="#000000" fontWeight="bold" fontFamily="Arial" enabled="true" id="ch1_cost"/>
+			<mx:Label x="472" y="118" text="0000" width="70" height="27" fontSize="20" color="#000000" fontWeight="bold" fontFamily="Arial" enabled="true" id="ch1_changed"/>
+			<mx:Label x="551" y="118" text="0000" width="70" height="27" fontSize="20" color="#000000" fontWeight="bold" fontFamily="Arial" enabled="true" id="ch2_changed"/>
+			<mx:Label x="629" y="118" text="0000" width="70" height="27" fontSize="20" color="#000000" fontWeight="bold" fontFamily="Arial" enabled="true" id="ch3_changed"/>
+			<mx:Label x="145" y="69" text="0000" width="95" height="35" fontSize="26" color="#000000" fontWeight="bold" fontFamily="Arial" enabled="true" id="cost"/>
+			<mx:Label x="131" y="77" text="€" fontSize="16"/>
+			<mx:Label x="10" y="222" width="205" id="lastupdate"/>
+			<mx:Label x="460" y="81" text="€" fontSize="12"/>
+			<mx:Label x="551" y="75" text="0000" width="70" height="27" fontSize="20" color="#000000" fontWeight="bold" fontFamily="Arial" enabled="true" id="ch2_cost"/>
+			<mx:Label x="629" y="75" text="0000" width="70" height="27" fontSize="20" color="#000000" fontWeight="bold" fontFamily="Arial" enabled="true" id="ch3_cost"/>
+			<mx:Label x="619" y="81" text="€" fontSize="12"/>
+			<mx:Label x="539" y="81" text="€" fontSize="12"/>
+			<mx:Label x="19" y="87" text="Per Day"/>
+			<mx:Image x="125" y="117" width="20" height="24" source="{Down}" id="total_changed_image_down"/>
+			<mx:Image x="125" y="117" width="20" height="24" source="{Up}" id="total_changed_image_up"/>
+			<mx:Image x="453" y="115" width="20" height="31" source="{Down}" id="ch1_changed_image_down"/>
+			<mx:Image x="453" y="115" width="20" height="31" source="{Up}" id="ch1_changed_image_up"/>
+			<mx:Image x="532" y="115" width="20" height="31" source="{Down}" id="ch2_changed_image_down"/>
+			<mx:Image x="532" y="115" width="20" height="31" source="{Up}" id="ch2_changed_image_up"/>
+			<mx:Image x="610" y="115" width="20" height="31" source="{Down}" id="ch3_changed_image_down"/>
+			<mx:Image x="610" y="115" width="20" height="31" source="{Up}" id="ch3_changed_image_up"/>
+			<mx:Image x="472" y="172" width="200" height="68"/>
+		</mx:Canvas>
+		<mx:Canvas label="Settings" width="100%" height="100%">
+			<mx:Panel x="10" y="10" width="500" height="230" layout="absolute" title="Data Feed Settings">
+				<mx:TextInput x="129" y="15" text="http://linuxserver/currentcost/data.xml" width="341"/>
+				<mx:TextInput x="129" y="44" text="6" width="176"/>
+				<mx:Label x="10" y="17" text="Data URI"/>
+				<mx:Label x="10" y="45" text="Refresh Interval"/>
+				<mx:Label x="10" y="77" text="Data Format"/>
+				<mx:Label x="10" y="110" text="Graphing" fontWeight="bold"/>
+				<mx:RadioButtonGroup id="Graphing"/>
+				<mx:RadioButton x="24" y="136" label="Total" groupName="Graphing" selected="true"/>
+				<mx:RadioButton x="24" y="162" label="Channels" groupName="Graphing"/>
+				<mx:RadioButtonGroup id="DataFormat"/>
+				<mx:RadioButton x="129" y="75" label="CurrentCost XML" groupName="DataFormat"/>
+				<mx:RadioButton x="264" y="75" label="Custom XML" groupName="DataFormat" selected="true"/>
+				<mx:Label x="313" y="45" text="Seconds"/>
+				<mx:Button x="155" y="136" label="Stack" width="73" click="Stack()"/>
+				<mx:Button x="155" y="158" label="UnStack" click="UnStack()"/>
+			</mx:Panel>
+			<mx:Panel x="518" y="10" width="250" height="230" layout="absolute" title="Electricty Prices">
+			</mx:Panel>
+		</mx:Canvas>
+	</mx:Accordion>
+</mx:Application>
