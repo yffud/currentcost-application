@@ -1,0 +1,6 @@
+#summary Changelog for information on application updates
+
+= Change log =
+
+
+||0.1.0||Initial prototype application createed ||
