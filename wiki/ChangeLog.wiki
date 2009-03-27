@@ -1,6 +1,6 @@
 #summary Changelog for information on application updates
 
-See ?Features for a description of features added 
+See Features? for a description of features added 
 
 
 = Change log =
