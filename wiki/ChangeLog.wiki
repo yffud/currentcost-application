@@ -3,4 +3,4 @@
 = Change log =
 
 
-||0.1.0||Initial prototype application createed ||
+||0.1.0||Initial prototype application created ||
