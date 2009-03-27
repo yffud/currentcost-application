@@ -20,6 +20,13 @@
             public var Down:Class; 
             
             
+            // Energy Masters Log
+            [Embed(source="assets/EnergyMastersIreland.png")]
+            
+            [Bindable]
+            public var EnergyMasters:Class;
+            
+            
         
             [Bindable] private var myRandomData:ArrayCollection;
             [Bindable] private var powerChannels:ArrayCollection;
@@ -412,7 +419,7 @@
 			<mx:Image x="532" y="115" width="20" height="31" source="{Up}" id="ch2_changed_image_up"/>
 			<mx:Image x="610" y="115" width="20" height="31" source="{Down}" id="ch3_changed_image_down"/>
 			<mx:Image x="610" y="115" width="20" height="31" source="{Up}" id="ch3_changed_image_up"/>
-			<mx:Image x="472" y="172" width="200" height="68"/>
+			<mx:Image x="452" y="172" width="207" height="70" source="{EnergyMasters}"/>
 		</mx:Canvas>
 		<mx:Canvas label="Settings" width="100%" height="100%">
 			<mx:Panel x="10" y="10" width="500" height="230" layout="absolute" title="Data Feed Settings">
