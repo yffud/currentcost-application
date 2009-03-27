@@ -1,3 +1,5 @@
 #summary Overview of the features available in the Energy Monitoring application.
 
 =Features=
+
+This application for monitoring the electricity usage in Real-Time and viewing of historical data collected from the CurrentCost device is designed as a client/server model. The Client is built using Adobe Flex which allows the application to be deployed as a Browser based application running from any computer which has flash installed, Or as a desktop application running in the Adobe Air runtime.
