@@ -1,0 +1,12 @@
+#summary Development plan for the application
+
+= Development Plans =
+
+Client server application.
+
+
+= Reasons for Client/Server Model =
+
+Benefits of client server model for energy monitoring application.
+  * Allows lightweight client on any computer (OS Independent) remote access
+  * Provides the ability to have a single computer / server monitoring stats eg Micro Computer
